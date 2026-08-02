@@ -3,12 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasta</title>
+    <title>TaskNester</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Saif Elkastawy</h1>
-    <h2>Kasta</h2>
+
+    <h1>TaskNester</h1>
+
+    <section>
+        <h2>Add New Task</h2>
+
+        <form id="taskForm">
+            <div>
+                <label for="title">Title</label><br>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    required
+                >
+            </div>
+
+            <br>
+
+            <div>
+                <label for="description">Description</label><br>
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                ></textarea>
+            </div>
+
+            <br>
+
+            <div>
+                <label for="dueDate">Due Date</label><br>
+                <input
+                    type="date"
+                    id="dueDate"
+                    name="dueDate"
+                    required
+                >
+            </div>
+
+            <br>
+
+            <div>
+                <label for="priority">Priority</label><br>
+                <select
+                    id="priority"
+                    name="priority"
+                >
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+
+            <br>
+
+            <button type="submit">Add Task</button>
+        </form>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Your Tasks</h2>
+
+        <div id="tasksContainer"></div>
+    </section>
+
+    <template id="taskTemplate">
+    </template>
+
     <script src="script.js"></script>
+
 </body>
 </html>
