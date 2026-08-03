@@ -53,6 +53,38 @@ class Task {
         return this._priority;
     }
 
+    set title(value) {
+        if (!value || value.trim() === "") {
+            throw new Error("Title cannot be empty.");
+        }
+        this._title = value;
+    }
+
+    get title() {
+        return this._title;
+    }
+
+    set description(value) {
+        this._description = value;
+    }
+
+    get description() {
+        return this._description;
+    }
+
+    set dueDate(value) {
+        const date = new Date(value);
+        const now = new Date();
+        if (date < now) {
+            throw new Error("Due date cannot be in the past.");
+        }
+        this._dueDate = value;
+    }
+
+    get dueDate() {
+        return this._dueDate;
+    }
+
     set status(value) {
         const statuses = [
             Task.STATUS.PENDING,
@@ -80,145 +112,110 @@ class Task {
             tasks[index] = this;
         }
 
+        const priorityOrder = {
+            [Task.PRIORITY.HIGH]: 3,
+            [Task.PRIORITY.MEDIUM]: 2,
+            [Task.PRIORITY.LOW]: 1,
+        };
+
+        tasks.sort((a, b) => {
+            const priorityDiff =
+                priorityOrder[b.priority] - priorityOrder[a.priority];
+
+            if (priorityDiff !== 0) {
+                return priorityDiff;
+            }
+
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+
         localStorage.setItem("tasks", JSON.stringify(tasks));
     }
 }
 
-const form = document.getElementById("taskForm");
-const tasksContainer = document.getElementById("tasksContainer");
 
-function renderTasks() {
-    tasksContainer.innerHTML = "";
-
-    tasks.forEach(task => {
-        tasksContainer.innerHTML += `
-            <article class="task">
-                <h3>${task.title}</h3>
-
-                <p>${task.description}</p>
-
-                <p>
-                    <strong>Due Date:</strong>
-                    ${new Date(task.dueDate).toLocaleDateString()}
-                </p>
-
-                <p>
-                    <strong>Priority:</strong>
-                    ${task._priority}
-                </p>
-
-                <p>
-                    <strong>Status:</strong>
-                    ${task._status}
-                </p>
-
-                <button class="edit-btn" data-id="${task.id}">
-                    Edit
-                </button>
-
-                <button class="delete-btn" data-id="${task.id}">
-                    Delete
-                </button>
-
-                <button class="start-btn" data-id="${task.id}">
-                    Start
-                </button>
-
-                <button class="complete-btn" data-id="${task.id}">
-                    Complete
-                </button>
-
-                <hr>
-            </article>
-        `;
-    });
+function setCookie(name, value, maxAge = 315360000) {
+    document.cookie = `${name}=${value}; Max-Age=${maxAge}; path=/`;
 }
 
-renderTasks();
+function getCookie(name) {
+    const cookie = document.cookie
+        .split("; ")
+        .find(row => row.startsWith(name + "="));
 
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
+    return cookie ? cookie.split("=")[1] : null;
+}
 
-    new Task(
-        title.value,
-        description.value,
-        new Date(dueDate.value),
-        priority.value
-    );
+function loadTheme() {
+    const body = document.body;
+    const sun = document.getElementById("sun");
+    const moon = document.getElementById("moon");
 
-    form.reset();
+    const isDark = getCookie("darkMode") === "true";
 
-    renderTasks();
+    if (isDark) {
+        body.classList.add("dark-mode");
+
+        sun.style.display = "block";
+        moon.style.display = "none";
+    } else {
+        body.classList.remove("dark-mode");
+
+        sun.style.display = "none";
+        moon.style.display = "block";
+    }
+}
+
+function toggleMode() {
+    const isDark = getCookie("darkMode") === "true";
+
+    if (isDark) {
+        setCookie("darkMode", "false");
+    } else {
+        setCookie("darkMode", "true");
+    }
+
+    loadTheme();
+}
+
+loadTheme();
+
+document
+    .querySelector(".modeToggleBtn")
+    .addEventListener("click", toggleMode);
+
+const menuToggleBtn = document.getElementById("menuToggleBtn");
+const navLinksList = document.querySelector(".navLinksList");
+const navLinks = document.querySelectorAll(".navLink");
+
+function closeMenu() {
+    if (menuToggleBtn.classList.contains("opened")) {
+        menuToggleBtn.classList.remove("opened");
+        menuToggleBtn.classList.add("closed");
+    }
+}
+
+function toggleMenu() {
+    if (menuToggleBtn.classList.contains("closed")) {
+        menuToggleBtn.classList.remove("closed");
+        menuToggleBtn.classList.add("opened");
+    } else {
+        closeMenu();
+    }
+}
+
+menuToggleBtn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    toggleMenu();
 });
 
-tasksContainer.addEventListener("click", (e) => {
-    const id = Number(e.target.dataset.id);
-
-    const task = tasks.find(task => task.id === id);
-
-    if (!task) return;
-
-    if (e.target.classList.contains("delete-btn")) {
-        if (!confirm(`Delete "${task.title}"?`)) {
-            return;
-        }
-
-        tasks = tasks.filter(task => task.id !== id);
-
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-
-        renderTasks();
-    }
-
-    if (e.target.classList.contains("start-btn")) {
-        task._status = Task.STATUS.IN_PROGRESS;
-
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-
-        renderTasks();
-    }
-
-    if (e.target.classList.contains("complete-btn")) {
-        task._status = Task.STATUS.COMPLETED;
-
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-
-        renderTasks();
-    }
-
-    if (e.target.classList.contains("edit-btn")) {
-        const newTitle = prompt("Title", task.title);
-
-        if (newTitle === null) {
-            return;
-        }
-
-        const newDescription = prompt(
-            "Description",
-            task.description
-        );
-
-        if (newDescription === null) {
-            return;
-        }
-
-        task.title = newTitle;
-        task.description = newDescription;
-
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-
-        renderTasks();
-    }
+navLinks.forEach(link => {
+    link.addEventListener("click", closeMenu);
 });
 
-window.addEventListener("storage", (event) => {
-    if (event.key === "tasks") {
-        tasks = JSON.parse(event.newValue) || [];
-
-        renderTasks();
-    }
-
-    if (event.key === "taskIdCounter") {
-        Task.idCounter = Number(event.newValue) || 1;
+document.addEventListener("click", function(e) {
+    const isClickInside = menuToggleBtn.contains(e.target) || navLinksList.contains(e.target);
+    if (!isClickInside) {
+        closeMenu();
     }
 });

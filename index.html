@@ -3,81 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskNester</title>
+    <meta name="description" content="TaskNester helps you organize tasks, track deadlines, manage priorities, and stay productive with a clean, fast interface.">
+    <meta name="author" content="Saif Elkastawy">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="TaskNester">
+    <meta property="og:description" content="Organize your tasks and boost productivity with TaskNester.">
+    <meta property="og:type" content="website">
+    <title>TaskNester | Smart Task Management App</title>
+    <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="">
 
-    <h1>TaskNester</h1>
+    <header>
+        <nav class="navbar">
+            <h1 class="navTitle" onClick="window.location.reload()">TaskNester</h1>
+            
+            <button title="Menu-Toggle-Button" type="button" id="menuToggleBtn" class="menuToggleBtn closed" aria-label="Toggle menu">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="menuIcon" class="menuIcon icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
 
-    <section>
-        <h2>Add New Task</h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="closeIcon icon" class="closeIcon"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <ul class="navLinksList">
+                <li class="navLinkItem"><a class="navLink" href="#all">All Tasks</a></li>
+                <li class="navLinkItem"><a class="navLink" href="#pending">Pending</a></li>
+                <li class="navLinkItem"><a class="navLink" href="#completed">Completed</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <form id="taskForm">
-            <div>
-                <label for="title">Title</label><br>
-                <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    required
-                >
-            </div>
+    <main>
+        <!--  -->
+    </main>
 
-            <br>
+    <button title="Mode-Toggle_Button" type="button" class="modeToggleBtn" aria-label="Toggle dark mode">
+        <svg id="moon" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" class="moonIcon icon"><title>Moon</title><path id="Moon" d="M24.86,15.53a.5.5,0,0,0-.57,0A10.71,10.71,0,0,1,9.57.79.5.5,0,0,0,9,0,12.77,12.77,0,1,0,25,16,.5.5,0,0,0,24.86,15.53Z" fill="currentcolor"></path></svg>
 
-            <div>
-                <label for="description">Description</label><br>
-                <textarea
-                    id="description"
-                    name="description"
-                    rows="4"
-                ></textarea>
-            </div>
+        <svg id="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentcolor" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sunIcon icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    </button>
 
-            <br>
-
-            <div>
-                <label for="dueDate">Due Date</label><br>
-                <input
-                    type="date"
-                    id="dueDate"
-                    name="dueDate"
-                    required
-                >
-            </div>
-
-            <br>
-
-            <div>
-                <label for="priority">Priority</label><br>
-                <select
-                    id="priority"
-                    name="priority"
-                >
-                    <option value="low">Low</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="high">High</option>
-                </select>
-            </div>
-
-            <br>
-
-            <button type="submit">Add Task</button>
-        </form>
-    </section>
-
-    <hr>
-
-    <section>
-        <h2>Your Tasks</h2>
-
-        <div id="tasksContainer"></div>
-    </section>
-
-    <template id="taskTemplate"></template>
-
-    <script src="script.js"></script>
-
+    <script src="script.js" defer></script>
 </body>
 </html>

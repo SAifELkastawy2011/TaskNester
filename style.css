@@ -1,0 +1,354 @@
+:root{
+    --bg-color: #f5f5f5;
+    --primary-color: #111;
+    --secondary-color: #666;
+    --title-color: #217ff2;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.dark-mode{
+    --bg-color: #111;
+    --primary-color: #f5f5f5;
+    --secondary-color: #ccc;
+    --title-color: #217ff2;
+    --card-bg: #222;
+    --shadow: 0 4px 8px rgba(255,255,255,0.1);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: var(--bg-color);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 100vh;
+}
+
+.navbar{
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+.dark-mode .navbar {
+    box-shadow: 0 2px 4px 4px rgba(255, 255, 255, 0.2);
+}
+
+.navTitle{
+    color: var(--title-color);
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.navLinksList{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    gap: 0.8rem;
+}
+
+.navLinkItem{
+    transition: all 0.3s ease;
+}
+
+.navLink{
+    color: var(--bg-color);
+    text-decoration: none;
+    font-weight: medium;
+    transition: all 0.3s ease;
+}
+.navLinkItem:hover{
+    transform: translateY(-3px);
+    .navLink{
+        color: var(--title-color);
+    }
+}
+
+/* --- Task UI Styles --- */
+.task-section {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 2rem;
+    width: 100%;
+}
+
+.form-container {
+    background: linear-gradient(135deg, #6db3f2 0%, #1e69de 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: white;
+    box-shadow: var(--shadow);
+    height: fit-content;
+}
+
+.task-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.task-form label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+}
+
+.task-form input, 
+.task-form select {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.btn-primary {
+    background-color: #fff;
+    color: #1e69de;
+    border: none;
+    padding: 0.8rem;
+    width: 100%;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-primary:hover {
+    background-color: #eee;
+}
+
+.tasks-container {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    color: var(--primary-color);
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.task-card {
+    border-left: 6px solid #ccc;
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.task-card:hover {
+    transform: translateX(4px);
+}
+
+.task-card.priority-high { border-color: #ff4444; }
+.task-card.priority-medium { border-color: #ffaa00; }
+.task-card.priority-low { border-color: #44bb44; }
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-title {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.task-priority {
+    font-size: 0.7rem;
+    background: #eee;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    text-transform: capitalize;
+}
+.task-priority.high { background: #ffdddd; color: #cc0000; }
+.task-priority.medium { background: #fff3cd; color: #856404; }
+.task-priority.low { background: #d4edda; color: #155724; }
+
+.task-desc {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin: 0.2rem 0;
+}
+
+.task-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.task-date {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.task-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.status-select {
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--secondary-color);
+    background: var(--bg-color);
+    color: var(--primary-color);
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.2rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+.empty-msg {
+    text-align: center;
+    color: var(--secondary-color);
+    font-size: 1rem;
+    padding: 2rem 0;
+}
+
+/* --- Mobile Menu fixes --- */
+.menuToggleBtn{
+    background-color: transparent;
+    display: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    border: none;
+    cursor: pointer;
+}
+.menuToggleBtn svg {
+    color: var(--bg-color);
+}
+
+.icon{
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 450px) {
+    .menuToggleBtn {
+        display: block;
+    }
+
+    /* Menu Icon display logic based on button class */
+    .menuToggleBtn.opened .closeIcon { display: block; }
+    .menuToggleBtn.opened .menuIcon { display: none; }
+    
+    .menuToggleBtn.closed .closeIcon { display: none; }
+    .menuToggleBtn.closed .menuIcon { display: block; }
+
+    .navLinksList {
+        position: absolute;
+        top: 120%;
+        right: 1rem;
+        background-color: var(--primary-color);
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        z-index: 10; /* Prevents menu from being hidden behind content */
+        box-shadow: var(--shadow);
+    }
+    
+    /* Menu List display logic based on button class */
+    .menuToggleBtn.opened ~ .navLinksList {
+        display: flex;
+    }
+    .menuToggleBtn.closed ~ .navLinksList {
+        display: none;
+    }
+}
+
+/* Mobile responsive layout for the form/grid */
+@media (max-width: 768px) {
+    .task-section {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* --- Dark Mode Button --- */
+.modeToggleBtn{
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+    position: fixed; /* Changed to fixed so it stays in corner */
+    right: 1rem;
+    bottom: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    z-index: 20; /* High z-index so it stays on top */
+}
+.modeToggleBtn:hover{
+    transform: translateY(-3px);
+}
+.dark-mode .modeToggleBtn {
+    box-shadow: 0 2px 4px 3px rgba(255, 255, 255, 0.3);
+}
+
+.moonIcon{
+    color: var(--bg-color);
+    font-size: 1.5rem;
+    display: none;
+}
+
+.sunIcon{
+    color: var(--bg-color);
+    font-size: 1.5rem;
+    display: block;
+}
