@@ -205,9 +205,15 @@ class Task {
 
         return task;
     }
+    
+    static deleteAll() {
+        tasks.length = 0;
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
 }
 
 let tasks = (JSON.parse(localStorage.getItem("tasks")) || []).map(Task.fromJSON);
+let editingTaskId = null;
 
 function setCookie(name, value, maxAge = 315360000) {
     document.cookie = `${name}=${value}; Max-Age=${maxAge}; path=/`;
@@ -230,12 +236,10 @@ function loadTheme() {
 
     if (isDark) {
         body.classList.add("dark-mode");
-
         sun.style.display = "block";
         moon.style.display = "none";
     } else {
         body.classList.remove("dark-mode");
-
         sun.style.display = "none";
         moon.style.display = "block";
     }
@@ -255,9 +259,7 @@ function toggleMode() {
 
 loadTheme();
 
-document
-    .querySelector(".modeToggleBtn")
-    .addEventListener("click", toggleMode);
+document.querySelector(".modeToggleBtn").addEventListener("click", toggleMode);
 
 const menuToggleBtn = document.getElementById("menuToggleBtn");
 const navLinksList = document.querySelector(".navLinksList");
@@ -315,3 +317,210 @@ function alarmNearEndTask() {
 };
 
 alarmNearEndTask();
+
+function renderTasks(tasksToRender = tasks) {
+    const tasksList = document.getElementById("tasksList");
+
+    if (tasksToRender.length === 0) {
+        tasksList.innerHTML = `
+            <li>
+                <h1 class="noTasks">No Tasks Were Added</h1>
+            </li>
+        `;
+        return;
+    }
+
+    tasksList.innerHTML = tasksToRender.map(task => `
+        <li class="taskItem ${task.priority}">
+            <div class="textContainer">
+                <div class="text1container">
+                    <h3 class="taskTitle">${task.title}</h3>
+                    <h5 class="taskDate">
+                        ${new Date(task.dueDate).toLocaleDateString()}
+                    </h5>
+                </div>
+
+                <p class="taskDesc">${task.description || 'No description'}</p>
+
+                <small>Status: ${task.status}</small>
+            </div>
+
+            <div class="buttonsContainer">
+                <button class="ordersBtn" onclick="deleteTask(${task.id})">Delete</button>
+                <button class="ordersBtn" onclick="openEditModal(${task.id})">Edit</button>
+                <button class="ordersBtn" onclick="completeTask(${task.id})">Complete</button>
+                <button class="ordersBtn" onclick="startTask(${task.id})">Start</button>
+            </div>
+        </li>
+    `).join("");
+}
+
+function filterTasks() {
+    const searchInput = document.getElementById("searchInput");
+    const query = searchInput.value.toLowerCase().trim();
+
+    if (!query) {
+        renderTasks(tasks);
+        return;
+    }
+
+    const filtered = tasks.filter(task => 
+        task.title.toLowerCase().includes(query) ||
+        task.description.toLowerCase().includes(query)
+    );
+    renderTasks(filtered);
+}
+
+function deleteTask(id) {
+    if (confirm("Are you sure you want to delete this task?")) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            task.delete();
+            renderTasks();
+            filterTasks();
+        }
+    }
+}
+
+function completeTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        task.complete();
+        renderTasks();
+        filterTasks();
+    }
+}
+
+function startTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        try {
+            task.start();
+            renderTasks();
+            filterTasks();
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+}
+
+// Modal Functions
+function openModal(title = "Add New Task", task = null) {
+    const modal = document.getElementById("taskModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const submitBtn = document.getElementById("submitTaskBtn");
+    const form = document.getElementById("taskForm");
+
+    modal.style.display = "block";
+    modalTitle.textContent = title;
+    
+    if (task) {
+        document.getElementById("taskTitle").value = task.title;
+        document.getElementById("taskDescription").value = task.description || "";
+        document.getElementById("taskDueDate").value = task.dueDate;
+        document.getElementById("taskPriority").value = task.priority;
+        document.getElementById("taskStatus").value = task.status;
+        submitBtn.textContent = "Update Task";
+        editingTaskId = task.id;
+    } else {
+        form.reset();
+        document.getElementById("taskDueDate").value = "";
+        submitBtn.textContent = "Add Task";
+        editingTaskId = null;
+    }
+}
+
+function closeModal() {
+    document.getElementById("taskModal").style.display = "none";
+    document.getElementById("taskForm").reset();
+    editingTaskId = null;
+}
+
+function openEditModal(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        openModal("Edit Task", task);
+    }
+}
+
+document.querySelector(".close-modal").addEventListener("click", closeModal);
+
+window.addEventListener("click", function(e) {
+    const modal = document.getElementById("taskModal");
+    if (e.target === modal) {
+        closeModal();
+    }
+});
+
+document.getElementById("addTaskBtn").addEventListener("click", function() {
+    openModal();
+});
+
+document.getElementById("taskForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const title = document.getElementById("taskTitle").value.trim();
+    const description = document.getElementById("taskDescription").value.trim();
+    const dueDate = document.getElementById("taskDueDate").value;
+    const priority = document.getElementById("taskPriority").value;
+    const status = document.getElementById("taskStatus").value;
+
+    if (!title) {
+        alert("Title is required!");
+        return;
+    }
+
+    if (!dueDate) {
+        alert("Due date is required!");
+        return;
+    }
+
+    try {
+        if (editingTaskId) {
+            const task = tasks.find(t => t.id === editingTaskId);
+            if (task) {
+                task.edit({
+                    title,
+                    description,
+                    dueDate,
+                    priority,
+                    status
+                });
+            }
+        } else {
+            new Task(title, description, dueDate, priority, status);
+        }
+
+        closeModal();
+        renderTasks();
+        filterTasks();
+        alarmNearEndTask();
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+document.getElementById("searchInput").addEventListener("input", filterTasks);
+
+// Navigation filtering
+document.querySelectorAll('.navLink').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = this.getAttribute('href').substring(1);
+        let filtered = [];
+
+        if (section === 'all') {
+            filtered = tasks;
+        } else if (section === 'pending') {
+            filtered = tasks.filter(task => task.status !== Task.STATUS.COMPLETED);
+        } else if (section === 'completed') {
+            filtered = tasks.filter(task => task.status === Task.STATUS.COMPLETED);
+        }
+
+        renderTasks(filtered);
+        document.getElementById('searchInput').value = '';
+    });
+});
+
+// Initial render
+renderTasks();
