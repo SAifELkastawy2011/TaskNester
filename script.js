@@ -413,6 +413,51 @@ function filterTasks() {
     renderTasks(filtered);
 }
 
+// ===== STORAGE EVENT LISTENER FOR CROSS-TAB SYNC =====
+// This listens for changes to localStorage from other tabs
+window.addEventListener('storage', function(e) {
+    // Only react to changes to the 'tasks' key
+    if (e.key === 'tasks') {
+        // Reload tasks from localStorage
+        const storedTasks = localStorage.getItem("tasks");
+        if (storedTasks) {
+            try {
+                const parsedData = JSON.parse(storedTasks);
+                // Update the tasks array with new data
+                tasks = parsedData.map(Task.fromJSON);
+                
+                // Re-render the current view
+                // Get current active filter from nav links
+                const activeLink = document.querySelector('.navLink.active');
+                let section = 'all';
+                if (activeLink) {
+                    section = activeLink.getAttribute('href').substring(1);
+                }
+                
+                // Apply the current filter
+                let filtered = [];
+                if (section === 'all') {
+                    filtered = tasks;
+                } else if (section === 'pending') {
+                    filtered = tasks.filter(task => task.status !== Task.STATUS.COMPLETED);
+                } else if (section === 'completed') {
+                    filtered = tasks.filter(task => task.status === Task.STATUS.COMPLETED);
+                }
+                
+                renderTasks(filtered);
+                
+                // Also reapply search filter if there's a search query
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput.value.trim()) {
+                    filterTasks();
+                }
+            } catch (e) {
+                console.error("Error syncing tasks from storage:", e);
+            }
+        }
+    }
+});
+
 window.deleteTask = deleteTask;
 window.openEditModal = openEditModal;
 window.completeTask = completeTask;
@@ -548,9 +593,16 @@ document.getElementById("taskForm").addEventListener("submit", function(e) {
 
 document.getElementById("searchInput").addEventListener("input", filterTasks);
 
+// Track active nav link for filtering
 document.querySelectorAll('.navLink').forEach(link => {
     link.addEventListener('click', function(e) {
         e.preventDefault();
+        
+        // Remove active class from all nav links
+        document.querySelectorAll('.navLink').forEach(l => l.classList.remove('active'));
+        // Add active class to clicked link
+        this.classList.add('active');
+        
         const section = this.getAttribute('href').substring(1);
         let filtered = [];
 
@@ -566,5 +618,8 @@ document.querySelectorAll('.navLink').forEach(link => {
         document.getElementById('searchInput').value = '';
     });
 });
+
+// Set initial active state
+document.querySelector('.navLink[href="#all"]')?.classList.add('active');
 
 renderTasks();
