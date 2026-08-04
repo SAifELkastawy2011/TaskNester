@@ -377,9 +377,9 @@ function renderTasks(tasksToRender = tasks) {
             <div class="textContainer">
                 <div class="text1container">
                     <h3 class="taskTitle">${task.title}</h3>
-                    <h5 class="taskDate">
+                    <h4 class="taskDate">
                         ${new Date(task.dueDate).toLocaleDateString()}
-                    </h5>
+                    </h4>
                 </div>
 
                 <p class="taskDesc">${task.description || 'No description'}</p>
