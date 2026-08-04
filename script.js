@@ -26,7 +26,6 @@ class Task {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
-
         this.priority = priority;
         this.status = status;
 
@@ -132,7 +131,14 @@ class Task {
             return new Date(a.dueDate) - new Date(b.dueDate);
         });
 
-        localStorage.setItem("tasks", JSON.stringify(tasks));
+        localStorage.setItem("tasks", JSON.stringify(tasks.map(task => ({
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            dueDate: task.dueDate,
+            _priority: task.priority,
+            _status: task.status
+        }))));
     }
 
     delete() {
@@ -144,7 +150,14 @@ class Task {
 
         tasks.splice(index, 1);
 
-        localStorage.setItem("tasks", JSON.stringify(tasks));
+        localStorage.setItem("tasks", JSON.stringify(tasks.map(task => ({
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            dueDate: task.dueDate,
+            _priority: task.priority,
+            _status: task.status
+        }))));
 
         return true;
     }
@@ -194,25 +207,54 @@ class Task {
     }
 
     static fromJSON(data) {
-        const task = Object.create(Task.prototype);
-
+        const task = new Task(
+            data.title,
+            data.description || "",
+            data.dueDate,
+            data._priority || Task.PRIORITY.LOW,
+            data._status || Task.STATUS.PENDING
+        );
+        
         task.id = data.id;
-        task._title = data.title;
-        task._description = data.description;
-        task._dueDate = data.dueDate;
-        task._priority = data._priority;
-        task._status = data._status;
-
+        
+        if (data.id >= Task.idCounter) {
+            Task.idCounter = data.id + 1;
+            localStorage.setItem("taskIdCounter", Task.idCounter);
+        }
+        
         return task;
     }
     
     static deleteAll() {
         tasks.length = 0;
-        localStorage.setItem("tasks", JSON.stringify(tasks));
+        localStorage.setItem("tasks", JSON.stringify([]));
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            title: this.title,
+            description: this.description,
+            dueDate: this.dueDate,
+            _priority: this.priority,
+            _status: this.status
+        };
     }
 }
 
-let tasks = (JSON.parse(localStorage.getItem("tasks")) || []).map(Task.fromJSON);
+let tasks = [];
+const storedTasks = localStorage.getItem("tasks");
+
+if (storedTasks) {
+    try {
+        const parsedData = JSON.parse(storedTasks);
+        tasks = parsedData.map(Task.fromJSON);
+    } catch (e) {
+        console.error("Error loading tasks:", e);
+        tasks = [];
+    }
+}
+
 let editingTaskId = null;
 
 function setCookie(name, value, maxAge = 315360000) {
@@ -371,6 +413,11 @@ function filterTasks() {
     renderTasks(filtered);
 }
 
+window.deleteTask = deleteTask;
+window.openEditModal = openEditModal;
+window.completeTask = completeTask;
+window.startTask = startTask;
+
 function deleteTask(id) {
     if (confirm("Are you sure you want to delete this task?")) {
         const task = tasks.find(t => t.id === id);
@@ -404,7 +451,6 @@ function startTask(id) {
     }
 }
 
-// Modal Functions
 function openModal(title = "Add New Task", task = null) {
     const modal = document.getElementById("taskModal");
     const modalTitle = document.getElementById("modalTitle");
@@ -502,7 +548,6 @@ document.getElementById("taskForm").addEventListener("submit", function(e) {
 
 document.getElementById("searchInput").addEventListener("input", filterTasks);
 
-// Navigation filtering
 document.querySelectorAll('.navLink').forEach(link => {
     link.addEventListener('click', function(e) {
         e.preventDefault();
@@ -522,5 +567,4 @@ document.querySelectorAll('.navLink').forEach(link => {
     });
 });
 
-// Initial render
 renderTasks();
